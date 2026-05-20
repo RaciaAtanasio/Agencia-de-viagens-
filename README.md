@@ -17,5 +17,5 @@ A interface web deve permitir a visualização dos transportes utilizados e apó
 - Ver a localização dos destinos num mapa para facilitar o planeamento de viagem.    
 
 - **HU04 — Sistema de Feedback e Reputação:** 
-Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes." 
+Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes.." 
 
