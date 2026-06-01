@@ -100,14 +100,18 @@ def get_feedback():
 # --------------------------------------------------------------------------- #
 # Escrita
 # --------------------------------------------------------------------------- #
-def add_feedback(id_viagem, comentario, classificacao):
-    """Grava uma nova linha de feedback. Devolve (sucesso, mensagem)."""
-    data = datetime.now().strftime("%Y-%m-%d %H:%M")
-    nova_linha = [str(id_viagem), str(comentario), str(classificacao), data]
+def add_feedback(id_viagem, utilizador, classificacao, comentario):
+    """Grava uma nova linha de feedback. Devolve (sucesso, mensagem).
+
+    Estrutura: Id_viagem, utilizador, classificacao, comentario.
+    """
+    nova_linha = [str(id_viagem), str(utilizador), str(classificacao), str(comentario)]
 
     sheet = conectar_sheets()
     if sheet is None:
-        return False, "Credenciais não disponíveis. Modo demonstração."
+        # Modo demonstração: guardar na lista mock para aparecer na listagem
+        _MOCK_FEEDBACK.append(nova_linha)
+        return True, "Feedback registado (modo demonstração)."
 
     try:
         wks = sheet.worksheet_by_title(FOLHA_FEEDBACK)
