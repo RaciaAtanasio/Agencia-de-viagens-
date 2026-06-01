@@ -17,5 +17,67 @@ A interface web deve permitir a visualização dos transportes utilizados e apó
 - Ver a localização dos destinos num mapa para facilitar o planeamento de viagem.    
 
 - **HU04 — Sistema de Feedback e Reputação:** 
-Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes.." 
+- Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes.
+
+- **HU05 — Infraestrutura e Base de Dados:** 
+- Configurar a ligação ao Google Sheets e os dados fictícios de fallback para testar localmente.
+
+- **HU06 — Testes de Integração, Segurança e Funcionalidade:** 
+- Garantir que o acesso privado é seguro, que o feedback persiste e que o servidor é estável.
+
+- **HU07 — Documentação e Preparação da Defesa:** 
+- Documentar a instalação e execução do projeto e preparar o deploy no Render.
+
+# Tecnologias
+
+- **Python 3** com **Flask** (interface web)
+- **pygsheets** (ligação ao Google Sheets)
+- **Folium** (mapa interativo dos destinos)
+- **gunicorn** (servidor de produção no Render)
+
+# Instalação
+
+1. Clonar o repositório e entrar na pasta do projeto.
+2. (Opcional) Criar um ambiente virtual.
+3. Instalar as dependências:
+
+```bash
+pip install -r requirements.txt
+```
+
+# Configuração (Google Sheets)
+
+A aplicação funciona em dois modos:
+
+- **Modo demonstração:** sem credenciais, usa dados fictícios. Não é preciso
+  configurar nada para testar localmente.
+- **Modo real:** coloca o ficheiro de credenciais da conta de serviço Google em
+  `secrets/credenciais.json` (esta pasta está no `.gitignore` e nunca é
+  versionada). A app passa automaticamente a ler/escrever no Google Sheets.
+
+# Execução local
+
+```bash
+python app.py
+```
+
+Depois abrir o endereço indicado no terminal (por omissão a porta 5000).
+
+# Testes
+
+```bash
+python -m unittest test_app.py -v
+```
+
+# Deploy no Render
+
+O ficheiro `render.yaml` já define o serviço. Configuração equivalente no painel
+do Render:
+
+- **Build Command:** `pip install -r requirements.txt`
+- **Start Command:** `gunicorn app:app`
+- **Variável de ambiente:** `RENDER=true` (ativa o modo de produção)
+
+Em produção, as credenciais Google devem ser colocadas como *Secret File* em
+`/etc/secrets/credenciais.json`. 
 

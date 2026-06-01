@@ -6,6 +6,8 @@ HU03 — Mapa interativo dos destinos com Folium.
 HU04 — Sistema de feedback e listagem de comentários.
 """
 
+import os
+
 from flask import Flask, request
 
 import data
@@ -127,4 +129,6 @@ def feedback():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Em produção (Render) o debug fica desligado e a porta vem do ambiente.
+    porta = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=porta, debug=not data.IS_PRODUCTION)

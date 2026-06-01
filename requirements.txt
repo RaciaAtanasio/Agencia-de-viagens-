@@ -4,3 +4,4 @@ folium==0.17.0
 google-auth-oauthlib==1.1.0
 google-auth-httplib2==0.2.0
 python-dotenv>=1.0.1
+gunicorn==21.2.0
