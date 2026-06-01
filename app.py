@@ -1,9 +1,10 @@
 """Aplicação web da Agência de Viagens (Flask).
 
 HU01 — Visualização pública dos itinerários lidos da folha `Base_viagens`.
+HU02 — Acesso privado aos dados do cliente através de palavra-chave.
 """
 
-from flask import Flask
+from flask import Flask, request
 
 import data
 import templates
@@ -21,7 +22,27 @@ th { background: #14507f; color: #fff; padding: 10px; text-align: left; }
 td { padding: 10px; border-bottom: 1px solid #ddd; }
 tr:nth-child(even) { background: #f8fafb; }
 .aviso { color: #856404; background: #fff3cd; padding: 10px; margin-top: 20px; }
+.erro { color: #c0392b; background: #fdeaea; padding: 10px; margin-top: 10px; }
+form { margin-top: 20px; }
+input, button { padding: 8px; margin-top: 5px; }
+a { color: #1a6fb5; }
 """
+
+
+def pagina(titulo, conteudo):
+    """Monta uma página HTML completa com cabeçalho e estilo."""
+    html = "<!DOCTYPE html><html lang='pt'><head>"
+    html += "<meta charset='UTF-8'>"
+    html += f"<title>{titulo}</title>"
+    html += f"<style>{CSS}</style>"
+    html += "</head><body>"
+    html += "<h1>Agência de Viagens - Grupo 3</h1>"
+    html += "<p><a href='/'>Início</a> | <a href='/cliente'>Área do Cliente</a></p>"
+    html += conteudo
+    if data.usar_mock():
+        html += "<p class='aviso'>Modo demonstração: a usar dados fictícios.</p>"
+    html += "</body></html>"
+    return html
 
 
 @app.route('/')
@@ -33,22 +54,37 @@ def index():
         viagens = []
 
     if not viagens:
-        return "<h1>Erro ao carregar dados</h1><p>Não foi possível ligar à base de dados.</p>"
+        return pagina("Erro", "<h2>Erro ao carregar dados</h2>"
+                      "<p>Não foi possível ligar à base de dados.</p>")
 
-    html = "<!DOCTYPE html><html lang='pt'><head>"
-    html += "<meta charset='UTF-8'>"
-    html += "<title>Agência de Viagens</title>"
-    html += f"<style>{CSS}</style>"
-    html += "</head><body>"
-    html += "<h1>Agência de Viagens - Grupo 3</h1>"
-    html += "<h2>Itinerários disponíveis</h2>"
-    html += templates.viagens_publicas(viagens)
+    conteudo = "<h2>Itinerários disponíveis</h2>"
+    conteudo += templates.viagens_publicas(viagens)
+    return pagina("Agência de Viagens", conteudo)
 
-    if data.usar_mock():
-        html += "<p class='aviso'>Modo demonstração: a usar dados fictícios.</p>"
 
-    html += "</body></html>"
-    return html
+@app.route('/cliente', methods=['GET', 'POST'])
+def cliente():
+    """HU02 — Acesso privado aos dados do cliente por palavra-chave."""
+    # GET: mostrar o formulário de login
+    if request.method == 'GET':
+        return pagina("Área do Cliente", templates.formulario_login())
+
+    # POST: verificar a palavra-chave introduzida
+    keyword = request.form.get('keyword', '').strip()
+
+    clientes = data.get_clientes()
+    headers = clientes[0]
+    # A palavra-chave está na última coluna (Keyword_acesso)
+    coluna_keyword = len(headers) - 1
+
+    for cliente_linha in clientes[1:]:
+        if cliente_linha[coluna_keyword] == keyword and keyword != "":
+            conteudo = templates.dados_cliente(cliente_linha, headers)
+            return pagina("Área do Cliente", conteudo)
+
+    # Palavra-chave inválida
+    erro = "Palavra-chave inválida. Tente novamente."
+    return pagina("Área do Cliente", templates.formulario_login(erro))
 
 
 if __name__ == '__main__':
