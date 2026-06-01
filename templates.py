@@ -58,3 +58,44 @@ def dados_cliente(cliente, headers):
     html += "</table>"
     html += "<p><a href='/cliente'>Sair</a></p>"
     return html
+
+
+def formulario_feedback(mensagem=""):
+    """HU04 — Formulário para deixar feedback de uma viagem."""
+    html = "<h2>Deixar feedback</h2>"
+    if mensagem:
+        html += f"<p class='aviso'>{mensagem}</p>"
+    html += "<form method='post' action='/feedback'>"
+    html += "<label>ID da viagem:</label><br>"
+    html += "<input type='text' name='id_viagem'><br>"
+    html += "<label>O seu nome:</label><br>"
+    html += "<input type='text' name='utilizador'><br>"
+    html += "<label>Classificação (1 a 5):</label><br>"
+    html += "<input type='number' name='classificacao' min='1' max='5'><br>"
+    html += "<label>Comentário:</label><br>"
+    html += "<textarea name='comentario'></textarea><br>"
+    html += "<button type='submit'>Enviar</button>"
+    html += "</form>"
+    return html
+
+
+def lista_feedback(dados):
+    """HU04 — Lista os feedbacks existentes (um por linha)."""
+    if not dados or len(dados) < 2:
+        return "<p>Ainda não há feedback.</p>"
+
+    html = "<table>"
+    headers = dados[0]
+    html += "<tr>"
+    for header in headers:
+        html += f"<th>{header}</th>"
+    html += "</tr>"
+
+    for row in dados[1:]:
+        html += "<tr>"
+        for valor in row:
+            html += f"<td>{valor}</td>"
+        html += "</tr>"
+
+    html += "</table>"
+    return html

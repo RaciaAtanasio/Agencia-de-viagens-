@@ -3,6 +3,7 @@
 HU01 — Visualização pública dos itinerários lidos da folha `Base_viagens`.
 HU02 — Acesso privado aos dados do cliente através de palavra-chave.
 HU03 — Mapa interativo dos destinos com Folium.
+HU04 — Sistema de feedback e listagem de comentários.
 """
 
 from flask import Flask, request
@@ -26,7 +27,8 @@ tr:nth-child(even) { background: #f8fafb; }
 .aviso { color: #856404; background: #fff3cd; padding: 10px; margin-top: 20px; }
 .erro { color: #c0392b; background: #fdeaea; padding: 10px; margin-top: 10px; }
 form { margin-top: 20px; }
-input, button { padding: 8px; margin-top: 5px; }
+input, button, textarea { padding: 8px; margin-top: 5px; }
+textarea { width: 300px; height: 80px; }
 a { color: #1a6fb5; }
 """
 
@@ -39,7 +41,9 @@ def pagina(titulo, conteudo):
     html += f"<style>{CSS}</style>"
     html += "</head><body>"
     html += "<h1>Agência de Viagens - Grupo 3</h1>"
-    html += "<p><a href='/'>Início</a> | <a href='/cliente'>Área do Cliente</a></p>"
+    html += ("<p><a href='/'>Início</a> | "
+             "<a href='/cliente'>Área do Cliente</a> | "
+             "<a href='/feedback'>Feedback</a></p>")
     html += conteudo
     if data.usar_mock():
         html += "<p class='aviso'>Modo demonstração: a usar dados fictícios.</p>"
@@ -63,6 +67,8 @@ def index():
     conteudo += templates.viagens_publicas(viagens)
     conteudo += "<h2>Mapa dos destinos</h2>"
     conteudo += mapa.criar_mapa(viagens)
+    conteudo += "<h2>Feedback dos clientes</h2>"
+    conteudo += templates.lista_feedback(data.get_feedback())
     return pagina("Agência de Viagens", conteudo)
 
 
@@ -89,6 +95,35 @@ def cliente():
     # Palavra-chave inválida
     erro = "Palavra-chave inválida. Tente novamente."
     return pagina("Área do Cliente", templates.formulario_login(erro))
+
+
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    """HU04 — Formulário de feedback e listagem dos comentários."""
+    # GET: mostrar o formulário + lista de feedbacks
+    if request.method == 'GET':
+        conteudo = templates.formulario_feedback()
+        conteudo += "<h2>Feedback dos clientes</h2>"
+        conteudo += templates.lista_feedback(data.get_feedback())
+        return pagina("Feedback", conteudo)
+
+    # POST: validar e gravar o feedback
+    id_viagem = request.form.get('id_viagem', '').strip()
+    utilizador = request.form.get('utilizador', '').strip()
+    classificacao = request.form.get('classificacao', '').strip()
+    comentario = request.form.get('comentario', '').strip()
+
+    # Validar campos obrigatórios
+    if not id_viagem or not utilizador or not classificacao or not comentario:
+        mensagem = "Por favor preencha todos os campos."
+        return pagina("Feedback", templates.formulario_feedback(mensagem))
+
+    sucesso, mensagem = data.add_feedback(id_viagem, utilizador,
+                                          classificacao, comentario)
+    conteudo = templates.formulario_feedback(mensagem)
+    conteudo += "<h2>Feedback dos clientes</h2>"
+    conteudo += templates.lista_feedback(data.get_feedback())
+    return pagina("Feedback", conteudo)
 
 
 if __name__ == '__main__':
