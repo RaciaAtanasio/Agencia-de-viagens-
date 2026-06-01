@@ -2,12 +2,14 @@
 
 HU01 — Visualização pública dos itinerários lidos da folha `Base_viagens`.
 HU02 — Acesso privado aos dados do cliente através de palavra-chave.
+HU03 — Mapa interativo dos destinos com Folium.
 """
 
 from flask import Flask, request
 
 import data
 import templates
+import mapa
 
 app = Flask(__name__)
 
@@ -59,6 +61,8 @@ def index():
 
     conteudo = "<h2>Itinerários disponíveis</h2>"
     conteudo += templates.viagens_publicas(viagens)
+    conteudo += "<h2>Mapa dos destinos</h2>"
+    conteudo += mapa.criar_mapa(viagens)
     return pagina("Agência de Viagens", conteudo)
 
 
