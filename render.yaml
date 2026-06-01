@@ -1,0 +1,12 @@
+# Configuração de deploy no Render (HU07).
+# Cria um Web Service Python que corre a aplicação Flask com gunicorn.
+services:
+  - type: web
+    name: agencia-de-viagens
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      # Marca o ambiente como produção (usado no data.py e no app.py).
+      - key: RENDER
+        value: "true"

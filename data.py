@@ -27,7 +27,11 @@ FOLHA_CLIENTES = "Clientes"
 FOLHA_FEEDBACK = "Feedback_viagens"
 
 # Caminho para o ficheiro de credenciais do Google.
-SERVICE_FILE = BASE_DIR / "secrets" / "credenciais.json"
+# No Render (produção) os segredos ficam em /etc/secrets; localmente em ./secrets.
+if IS_PRODUCTION:
+    SERVICE_FILE = Path("/etc/secrets/credenciais.json")
+else:
+    SERVICE_FILE = BASE_DIR / "secrets" / "credenciais.json"
 
 
 # --------------------------------------------------------------------------- #
