@@ -17,41 +17,68 @@ import mapa
 app = Flask(__name__)
 
 
-# Estilo simples para a página
 CSS = """
-body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f8; color: #333; }
-h1 { color: #14507f; }
-h2 { color: #1a6fb5; }
-table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 20px; }
-th { background: #14507f; color: #fff; padding: 10px; text-align: left; }
-td { padding: 10px; border-bottom: 1px solid #ddd; }
-tr:nth-child(even) { background: #f8fafb; }
-.aviso { color: #856404; background: #fff3cd; padding: 10px; margin-top: 20px; }
-.erro { color: #c0392b; background: #fdeaea; padding: 10px; margin-top: 10px; }
-form { margin-top: 20px; }
-input, button, textarea { padding: 8px; margin-top: 5px; }
-textarea { width: 300px; height: 80px; }
-a { color: #1a6fb5; }
+body { font-family: sans-serif; background: #f0f4f8; color: #2c3e50; padding: 30px; }
+header { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+h1 { color: #14507f; margin: 0 0 10px 0; }
+h2 { color: #1a6fb5; margin-top: 30px; }
+
+/* Menu em Botões */
+p a { text-decoration: none; color: #1a6fb5; font-weight: bold; padding: 6px 12px; border-radius: 6px; }
+p a:hover { background: #1a6fb5; color: white; }
+
+/* Tabelas e Formulários Arredondados */
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+th { background: #14507f; color: #fff; padding: 12px; text-align: left; }
+td { padding: 12px; border-bottom: 1px solid #eef2f5; }
+tr:hover { background: #f8fafc; }
+
+form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); max-width: 400px; }
+input, textarea, button { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+button { background: #14507f; color: white; font-weight: bold; border: none; cursor: pointer; }
+button:hover { background: #1a6fb5; }
+
+.aviso { color: #856404; background: #fff3cd; padding: 10px; border-radius: 6px; }
+.erro { color: #c0392b; background: #fdeaea; padding: 10px; border-radius: 6px; }
 """
 
-
 def pagina(titulo, conteudo):
-    """Monta uma página HTML completa com cabeçalho e estilo."""
+    """Monta uma página HTML completa com cabeçalho institucional e estilo."""
     html = "<!DOCTYPE html><html lang='pt'><head>"
     html += "<meta charset='UTF-8'>"
     html += f"<title>{titulo}</title>"
     html += f"<style>{CSS}</style>"
     html += "</head><body>"
-    html += "<h1>Agência de Viagens - Grupo 3</h1>"
+    
+    # --- NOVO CABEÇALHO INSTITUCIONAL ---
+    # --- NOVO CABEÇALHO INSTITUCIONAL ---
+    html += "<header style='border-bottom: 2px solid #14507f; padding-bottom: 10px; margin-bottom: 20px; text-align: center;'>"
+    
+    # AQUI ENTRA A VOSSA IMAGEM CORPORATIVA
+    
+    html += "  <h1 style='margin: 5px 0 0 0;'>Agência de Viagens</h1>"
+    html += "  <h3 style='margin-top: 0; color: #1a6fb5;'>Projeto 2 - Grupo 3</h3>"
+    html += "  <p style='margin: 3px 0;'><strong>Grupo:</strong> Helder Monteiro, Bruna Monteiro, Liliana Gonçalves e Racia Atanásio</p>"
+    html += "  <p style='margin: 3px 0;'><strong>Curso:</strong> MADS, TIWM, IPMaia | <em>junho de 2026</em></p>"
+    html += "</header>"
+    
+    # Menu de Navegação
     html += ("<p><a href='/'>Início</a> | "
              "<a href='/cliente'>Área do Cliente</a> | "
              "<a href='/feedback'>Feedback</a></p>")
+    
     html += conteudo
+    
     if data.usar_mock():
         html += "<p class='aviso'>Modo demonstração: a usar dados fictícios.</p>"
+        
+    # --- NOVO RODAPÉ ---
+    html += "<footer style='margin-top: 40px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; color: #777; font-size: 0.9em;'>"
+    html += "  <p>Instituto Politécnico da Maia</p>"
+    html += "</footer>"
+    
     html += "</body></html>"
     return html
-
 
 @app.route('/')
 def index():
