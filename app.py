@@ -4,6 +4,7 @@ HU01 — Visualização pública dos itinerários lidos da folha `Base_viagens`.
 HU02 — Acesso privado aos dados do cliente através de palavra-chave.
 HU03 — Mapa interativo dos destinos com Folium.
 HU04 — Sistema de feedback e listagem de comentários.
+HU05 (complemento) — Vista administrativa por chave fixa lida de `secrets/chave.json`.
 """
 
 import os
@@ -65,7 +66,8 @@ def pagina(titulo, conteudo):
     # Menu de Navegação
     html += ("<p><a href='/'>Início</a> | "
              "<a href='/cliente'>Área do Cliente</a> | "
-             "<a href='/feedback'>Feedback</a></p>")
+             "<a href='/feedback'>Feedback</a> | "
+             "<a href='/admin'>Admin</a></p>")
     
     html += conteudo
     
@@ -153,6 +155,35 @@ def feedback():
     conteudo += "<h2>Feedback dos clientes</h2>"
     conteudo += templates.lista_feedback(data.get_feedback())
     return pagina("Feedback", conteudo)
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    """HU05 (complemento) — Vista administrativa por chave fixa (chave.json)."""
+    if request.method == 'GET':
+        return pagina("Acesso Admin", templates.formulario_admin())
+
+    chave = request.form.get('chave', '').strip()
+    if not chave:
+        return pagina("Acesso Admin", templates.formulario_admin(
+            "Por favor introduza uma chave."))
+
+    chaves = data.get_chaves()
+    if chave not in chaves:
+        return pagina("Acesso Admin", templates.formulario_admin(
+            "Chave de acesso inválida."))
+
+    destino = chaves[chave]
+    if destino == "Clientes":
+        dados = data.get_clientes()
+        conteudo = templates.formulario_admin() + templates.tabela_admin(dados, "Clientes")
+    elif destino == "Base_viagens":
+        dados = data.get_viagens()
+        conteudo = templates.formulario_admin() + templates.tabela_admin(dados, "Base de Viagens (completa)")
+    else:
+        conteudo = templates.formulario_admin("Destino não reconhecido.")
+
+    return pagina("Acesso Admin", conteudo)
 
 
 if __name__ == '__main__':

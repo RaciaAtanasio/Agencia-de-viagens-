@@ -79,6 +79,46 @@ def formulario_feedback(mensagem=""):
     return html
 
 
+def formulario_admin(mensagem=""):
+    """HU05 — Formulário de acesso administrativo por chave fixa (chave.json)."""
+    html = "<h2>Acesso Administrativo</h2>"
+    if mensagem:
+        cls = "erro" if "inv" in mensagem.lower() else "aviso"
+        html += f"<p class='{cls}'>{mensagem}</p>"
+    html += "<form method='post' action='/admin'>"
+    html += "<label>Chave de acesso:</label><br>"
+    html += "<input type='password' name='chave'>"
+    html += "<button type='submit'>Aceder</button>"
+    html += "</form>"
+    return html
+
+
+def tabela_admin(dados, titulo):
+    """HU05 — Tabela administrativa (esconde a coluna Keyword_acesso)."""
+    if not dados or len(dados) < 2:
+        return "<p>Sem dados para apresentar.</p>"
+
+    headers = dados[0]
+    html = f"<h2>{titulo}</h2><table>"
+    html += "<tr>"
+    for h in headers:
+        if "keyword" in h.lower() or "senha" in h.lower():
+            continue
+        html += f"<th>{h}</th>"
+    html += "</tr>"
+
+    for row in dados[1:]:
+        html += "<tr>"
+        for i, valor in enumerate(row):
+            if i < len(headers) and ("keyword" in headers[i].lower() or "senha" in headers[i].lower()):
+                continue
+            html += f"<td>{valor}</td>"
+        html += "</tr>"
+
+    html += "</table>"
+    return html
+
+
 def lista_feedback(dados):
     """HU04 — Lista os feedbacks existentes (um por linha)."""
     if not dados or len(dados) < 2:
