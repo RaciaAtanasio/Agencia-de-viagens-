@@ -11,6 +11,7 @@ Estrutura esperada da spreadsheet (3 folhas):
     - Feedback_viagens:  Id_viagem, utilizador, classificacao, comentario
 """
 
+import json
 import os
 from datetime import datetime
 from pathlib import Path
@@ -30,8 +31,17 @@ FOLHA_FEEDBACK = "Feedback_viagens"
 # No Render (produção) os segredos ficam em /etc/secrets; localmente em ./secrets.
 if IS_PRODUCTION:
     SERVICE_FILE = Path("/etc/secrets/credenciais.json")
+    CHAVE_FILE = Path("/etc/secrets/chave.json")
 else:
     SERVICE_FILE = BASE_DIR / "secrets" / "credenciais.json"
+    CHAVE_FILE = BASE_DIR / "secrets" / "chave.json"
+
+
+# Chaves admin mock (fallback quando chave.json não está disponível).
+_MOCK_CHAVES = {
+    "admin2025": "Clientes",
+    "viagens2025": "Base_viagens",
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -54,6 +64,15 @@ def conectar_sheets():
 def usar_mock():
     """True quando a aplicação está a usar dados fictícios (sem credenciais)."""
     return conectar_sheets() is None
+
+
+def get_chaves():
+    """Carrega o ficheiro chave.json. Devolve chaves mock se o ficheiro não existir."""
+    try:
+        with open(CHAVE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return dict(_MOCK_CHAVES)
 
 
 # --------------------------------------------------------------------------- #

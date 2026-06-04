@@ -6,6 +6,9 @@ Testes de integração, segurança e funcionalidade:
     - Com a palavra-chave correta, os dados privados aparecem.
     - O feedback enviado reflete-se na listagem (persistência).
     - O formulário de feedback valida os campos obrigatórios.
+    - Chave admin errada não revela dados (segurança admin).
+    - Chave admin2025 mostra tabela de clientes sem palavra-chave (acesso admin).
+    - Chave viagens2025 mostra tabela completa com coordenadas (acesso admin).
 
 Como correr:
     python -m unittest test_app.py
@@ -73,6 +76,29 @@ class TestAgenciaViagens(unittest.TestCase):
         })
         texto = resposta.get_data(as_text=True)
         self.assertIn("preencha todos os campos", texto)
+
+
+    # --- Admin (chave.json) ----------------------------------------------- #
+    def test_admin_chave_errada_nao_mostra_dados(self):
+        """Com chave admin errada, mostra erro e não revela dados privados."""
+        resposta = self.cliente.post("/admin", data={"chave": "errada"})
+        texto = resposta.get_data(as_text=True)
+        self.assertIn("inválida", texto)
+        self.assertNotIn("123456789", texto)
+
+    def test_admin_chave_clientes_mostra_tabela(self):
+        """Com chave admin2025, mostra a tabela de clientes sem a palavra-chave."""
+        resposta = self.cliente.post("/admin", data={"chave": "admin2025"})
+        texto = resposta.get_data(as_text=True)
+        self.assertIn("Ana Silva", texto)
+        self.assertNotIn("ana123", texto)
+
+    def test_admin_chave_viagens_mostra_coordenadas(self):
+        """Com chave viagens2025, mostra a tabela completa incluindo coordenadas."""
+        resposta = self.cliente.post("/admin", data={"chave": "viagens2025"})
+        texto = resposta.get_data(as_text=True)
+        self.assertIn("Porto", texto)
+        self.assertIn("Latitude", texto)
 
 
 if __name__ == "__main__":

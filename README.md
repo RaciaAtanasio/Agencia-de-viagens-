@@ -12,25 +12,25 @@ A aplicação lê os dados de uma Google Spreadsheet com três folhas (`Base_via
 # Histórias de utilizador
 
 - **HU01 — Visualização Pública de Itinerários:**  
-- Consultar as tabela de viagens (passadas e futuras) para conhecer os destinos oferecidos pela agência. 
+  - Consultar as tabela de viagens (passadas e futuras) para conhecer os destinos oferecidos pela agência. 
 
 - **HU02 — Acesso Privado a Detalhes de Reserva:** 
-- Introdução de uma palavra-chave para aceder aos dados pessoais e detalhes confidenciais da reserva. 
+  - Introdução de uma palavra-chave para aceder aos dados pessoais e detalhes confidenciais da reserva. 
 
 - **HU03 — Localização Geográfica em Tempo Real:**  
-- Ver a localização dos destinos num mapa para facilitar o planeamento de viagem.    
+  - Ver a localização dos destinos num mapa para facilitar o planeamento de viagem.    
 
 - **HU04 — Sistema de Feedback e Reputação:** 
-- Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes.
+  - Registar críticas sobre experiência de viagem do cliente para ajudar outros viajantes.
 
 - **HU05 — Infraestrutura e Base de Dados:** 
-- Configurar a ligação ao Google Sheets e os dados fictícios de fallback para testar localmente.
+  - Configurar a ligação ao Google Sheets, os dados fictícios de fallback e o ficheiro `chave.json` para autenticação administrativa.
 
 - **HU06 — Testes de Integração, Segurança e Funcionalidade:** 
-- Garantir que o acesso privado é seguro, que o feedback persiste e que o servidor é estável.
+  - Garantir que o acesso privado é seguro, que o feedback persiste e que o servidor é estável.
 
 - **HU07 — Documentação e Preparação da Defesa:** 
-- Documentar a instalação e execução do projeto e preparar o deploy no Render.
+  - Documentar a instalação e execução do projeto e preparar o deploy no Render.
 
 # Tecnologias
 
@@ -55,9 +55,7 @@ A aplicação funciona em dois modos:
 
 - **Modo demonstração:** sem credenciais, usa dados fictícios. Não é preciso
   configurar nada para testar localmente.
-- **Modo real:** coloca o ficheiro de credenciais da conta de serviço Google em
-  `secrets/credenciais.json` (esta pasta está no `.gitignore` e nunca é
-  versionada). A app passa automaticamente a ler/escrever no Google Sheets.
+- **Modo real:** coloca os ficheiros `secrets/credenciais.json` e `secrets/chave.json` na pasta `secrets/` (esta pasta está no `.gitignore` e nunca é versionada). A app passa automaticamente a ler/escrever no Google Sheets.
 
 ## Criar as credenciais Google Cloud
 
@@ -70,6 +68,19 @@ Para ligar a app a um Google Sheet real:
 5. Dentro da conta de serviço, criar uma chave do tipo **JSON**.
 6. Descarregar o ficheiro `.json` e colocá-lo em `secrets/credenciais.json` (local) ou como *Secret File* no Render (produção).
 7. Copiar o email da conta de serviço e partilhar o Google Sheet com esse email (como leitor e editor).
+
+## Criar o ficheiro chave.json
+
+Para ativar o acesso administrativo:
+
+1. Criar o ficheiro `secrets/chave.json` com o seguinte conteúdo:
+```json
+{
+    "admin2025": "Clientes",
+    "viagens2025": "Base_viagens"
+}
+```
+2. Em produção no Render, criar um segundo *Secret File* em `/etc/secrets/chave.json` com as chaves reais.
 
 # Execução local
 
@@ -91,7 +102,7 @@ python -m unittest test_app.py -v
 
 ## O que os testes verificam
 
-A suite de 6 testes cobre os seguintes cenários:
+A suite de 9 testes cobre os seguintes cenários:
 
 1. **Estabilidade** — a página inicial responde com HTTP 200.
 2. **Segurança (acesso sem senha)** — ao aceder a `/cliente` sem POST, o NIF de um cliente não aparece.
@@ -99,6 +110,9 @@ A suite de 6 testes cobre os seguintes cenários:
 4. **Segurança (senha correta)** — com a palavra-chave correta, os dados privados (ex: "Ana Silva") são apresentados.
 5. **Persistência de feedback** — um comentário submetido aparece na listagem.
 6. **Validação de campos** — enviar o formulário com campos vazios mostra a mensagem "preencha todos os campos".
+7. **Segurança admin (chave errada)** — com chave admin errada, não revela dados privados.
+8. **Acesso admin (clientes)** — com chave `admin2025`, mostra a tabela de clientes sem a palavra-chave.
+9. **Acesso admin (viagens)** — com chave `viagens2025`, mostra a tabela completa com coordenadas.
 
 # Deploy no Render
 
@@ -110,5 +124,6 @@ do Render:
 - **Variável de ambiente:** `RENDER=true` (ativa o modo de produção)
 
 Em produção, as credenciais Google devem ser colocadas como *Secret File* em
-`/etc/secrets/credenciais.json`. 
+`/etc/secrets/credenciais.json`. O ficheiro `chave.json` deve ser colocado como
+segundo *Secret File* em `/etc/secrets/chave.json`. 
 
